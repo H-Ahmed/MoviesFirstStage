@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Movies First Stage</string>
-    
+
     <string name="api_key">
-         <!--Enter your api key Here-->
+         <!--Enter Your Api Key for https://api.themoviedb.org-->
     </string>
 
     <string name="sort_by_popular">popular</string>

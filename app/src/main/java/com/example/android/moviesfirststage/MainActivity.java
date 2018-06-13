@@ -1,24 +1,19 @@
 package com.example.android.moviesfirststage;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.example.android.moviesfirststage.models.Movies;
 import com.example.android.moviesfirststage.utilities.JsonUtils;
 import com.example.android.moviesfirststage.utilities.NetworkUtils;
-
 import java.net.URL;
-import java.util.Arrays;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,30 +33,36 @@ public class MainActivity extends AppCompatActivity {
     private Movies[] mMoviesData;
     private MoviesAdapter mAdapter;
 
+    private static final String MOVIES_DATA_KEY = "moviesData";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState != null && savedInstanceState.containsKey("orderByKey")){
-            orderBy = savedInstanceState.getString("orderByKey");
-        }else {
-            orderBy = getResources().getString(R.string.sort_by_popular);
+        if (savedInstanceState != null && savedInstanceState.containsKey(MOVIES_DATA_KEY)) {
+            mMoviesData = (Movies[]) savedInstanceState.getParcelableArray(MOVIES_DATA_KEY);
         }
 
+        orderBy = getResources().getString(R.string.sort_by_popular);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-
         API_KEY_VALUE = getResources().getString(R.string.api_key);
 
-        loadMovieData();
+        mAdapter = new MoviesAdapter(MainActivity.this);
+        if (mMoviesData != null) {
+            showMoviesData();
+            mAdapter.setMoviesData(mMoviesData);
+        } else {
+            showErrorMessage();
+            loadMovieData();
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("orderByKey", orderBy);
+        outState.putParcelableArray(MOVIES_DATA_KEY, mMoviesData);
     }
-
 
 
     private void loadMovieData() {
@@ -82,24 +83,23 @@ public class MainActivity extends AppCompatActivity {
         if (menuItemId == R.id.sort_by_popular) {
             orderBy = getResources().getString(R.string.sort_by_popular);
             loadMovieData();
-            Toast.makeText(MainActivity.this, orderBy, Toast.LENGTH_SHORT).show();
             return true;
         }
         if (menuItemId == R.id.sort_by_top_rated) {
             orderBy = getResources().getString(R.string.sort_by_top_rated);
             loadMovieData();
-            Toast.makeText(MainActivity.this, orderBy, Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void showMoviesData() {
+    private void showMoviesData() {
         mMoviesGridView.setVisibility(View.VISIBLE);
         mErrorMessageTextView.setVisibility(View.INVISIBLE);
+        mMoviesGridView.setAdapter(mAdapter);
     }
 
-    public void showErrorMessage() {
+    private void showErrorMessage() {
         mMoviesGridView.setVisibility(View.INVISIBLE);
         mErrorMessageTextView.setVisibility(View.VISIBLE);
     }
@@ -128,18 +128,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(final Movies[] moviesData) {
             mMoviesProgressBar.setVisibility(View.INVISIBLE);
             if (moviesData != null) {
-                showMoviesData();
                 mMoviesData = moviesData;
-                mAdapter = new MoviesAdapter(MainActivity.this, Arrays.asList(mMoviesData));
-                mMoviesGridView.setAdapter(mAdapter);
-                mMoviesGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
-                        intent.putExtra(Intent.EXTRA_TEXT, moviesData[i].getId());
-                        startActivity(intent);
-                    }
-                });
+                showMoviesData();
+                mAdapter.setMoviesData(moviesData);
             } else {
                 showErrorMessage();
             }
