@@ -1,55 +1,50 @@
 package com.example.android.moviesfirststage.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Movie {
 
+    @SerializedName("original_title")
     private String mOriginalTitle;
+    @SerializedName("poster_path")
     private String mPosterPath;
-    private String mOverView;
+    @SerializedName("overview")
+    private String mOverview;
+    @SerializedName("vote_average")
     private String mVoteAverage;
+    @SerializedName("release_date")
     private String mReleaseDate;
 
     public String getOriginalTitle() {
         return mOriginalTitle;
     }
 
-    public void setOriginalTitle(String mOriginalTitle) {
-        this.mOriginalTitle = mOriginalTitle;
-    }
-
     public String getPosterPath() {
         return mPosterPath;
     }
 
-    public void setPosterPath(String mPosterPath) {
-        this.mPosterPath = mPosterPath;
-    }
-
     public String getOverView() {
-        return mOverView;
-    }
-
-    public void setOverView(String mOverView) {
-        this.mOverView = mOverView;
+        return mOverview;
     }
 
     public String getVoteAverage() {
         return mVoteAverage;
     }
 
-    public void setVoteAverage(String mVoteAverage) {
-        this.mVoteAverage = mVoteAverage;
-    }
-
     public String getReleaseDate() {
         return mReleaseDate;
     }
 
-    public void setReleaseDate(String mReleaseDate) {
-        this.mReleaseDate = mReleaseDate;
-    }
-
-    public Movie() {
-
+    public Movie(String originalTitle
+            , String posterPath
+            , String overview
+            , String voteAverage
+            , String releaseDate) {
+        mOriginalTitle = originalTitle;
+        mPosterPath = posterPath;
+        mOverview = overview;
+        mVoteAverage = voteAverage;
+        mReleaseDate = releaseDate;
     }
 
 

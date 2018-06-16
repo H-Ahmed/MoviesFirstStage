@@ -1,29 +1,33 @@
 package com.example.android.moviesfirststage;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.example.android.moviesfirststage.models.Movies;
 import com.example.android.moviesfirststage.utilities.JsonUtils;
 import com.example.android.moviesfirststage.utilities.NetworkUtils;
+
 import java.net.URL;
 
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler {
 
     @BindView(R.id.pb_movies)
     ProgressBar mMoviesProgressBar;
-    @BindView(R.id.gv_movies)
-    GridView mMoviesGridView;
+    @BindView(R.id.rv_movies)
+    RecyclerView mMoviesRecyclerView;
     @BindView(R.id.tv_error_message)
     TextView mErrorMessageTextView;
 
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private MoviesAdapter mAdapter;
 
     private static final String MOVIES_DATA_KEY = "moviesData";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +53,11 @@ public class MainActivity extends AppCompatActivity {
 
         API_KEY_VALUE = getResources().getString(R.string.api_key);
 
-        mAdapter = new MoviesAdapter(MainActivity.this);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        mMoviesRecyclerView.setHasFixedSize(true);
+        mMoviesRecyclerView.setLayoutManager(layoutManager);
+        mAdapter = new MoviesAdapter(this, this);
+        mMoviesRecyclerView.setAdapter(mAdapter);
         if (mMoviesData != null) {
             showMoviesData();
             mAdapter.setMoviesData(mMoviesData);
@@ -64,6 +73,12 @@ public class MainActivity extends AppCompatActivity {
         outState.putParcelableArray(MOVIES_DATA_KEY, mMoviesData);
     }
 
+    @Override
+    public void onClick(String movieId) {
+        Intent intent = new Intent(this, MovieDetailsActivity.class);
+        intent.putExtra(Intent.EXTRA_TEXT, movieId);
+        startActivity(intent);
+    }
 
     private void loadMovieData() {
         showMoviesData();
@@ -94,13 +109,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showMoviesData() {
-        mMoviesGridView.setVisibility(View.VISIBLE);
+        mMoviesRecyclerView.setVisibility(View.VISIBLE);
         mErrorMessageTextView.setVisibility(View.INVISIBLE);
-        mMoviesGridView.setAdapter(mAdapter);
     }
 
     private void showErrorMessage() {
-        mMoviesGridView.setVisibility(View.INVISIBLE);
+        mMoviesRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageTextView.setVisibility(View.VISIBLE);
     }
 
@@ -132,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 showMoviesData();
                 mAdapter.setMoviesData(moviesData);
             } else {
+                mMoviesData = null;
                 showErrorMessage();
             }
         }

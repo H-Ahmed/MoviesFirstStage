@@ -37,8 +37,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
     ProgressBar mMovieProgressBar;
     @BindView(R.id.ly_movie_data)
     LinearLayout mMovieDataLinearLayout;
+    @BindView(R.id.detail_error_message)
+    TextView mDetailErrorMessageTextView;
 
     private static String API_KEY_VALUE;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,15 +56,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
             closeActivity();
         }
 
-        if(intent.hasExtra(Intent.EXTRA_TEXT)) {
+        if (intent.hasExtra(Intent.EXTRA_TEXT)) {
             String movieId = intent.getStringExtra(Intent.EXTRA_TEXT);
             new FetchMovieData().execute(movieId);
-        }else {
+        } else {
             closeActivity();
         }
     }
 
-    private void closeActivity(){
+    private void closeActivity() {
         finish();
         Toast.makeText(this, getResources().getString(R.string.error_message), Toast.LENGTH_SHORT).show();
     }
@@ -88,14 +91,29 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Movie moviesData) {
+        protected void onPostExecute(Movie movieData) {
+            if (movieData != null) {
+                showMovieDetailData(movieData);
+            } else {
+                showDetailErrorMessage();
+            }
+        }
+
+        private void showMovieDetailData(Movie movieData) {
             mMovieProgressBar.setVisibility(View.GONE);
             mMovieDataLinearLayout.setVisibility(View.VISIBLE);
-            Picasso.get().load("http://image.tmdb.org/t/p/w500//" + moviesData.getPosterPath()).into(mPosterMovieImageView);
-            mOriginalTitleTextView.setText(moviesData.getOriginalTitle());
-            mOverviewTextView.setText(moviesData.getOverView());
-            mVoteAverageTextView.setText(moviesData.getVoteAverage());
-            mReleaseDateTextView.setText(moviesData.getReleaseDate());
+            Picasso.get().load("http://image.tmdb.org/t/p/w500//" + movieData.getPosterPath()).into(mPosterMovieImageView);
+            mOriginalTitleTextView.setText(movieData.getOriginalTitle());
+            mOverviewTextView.setText(movieData.getOverView());
+            mVoteAverageTextView.setText(movieData.getVoteAverage());
+            mReleaseDateTextView.setText(movieData.getReleaseDate());
+        }
+
+        private void showDetailErrorMessage() {
+            mPosterMovieImageView.setVisibility(View.GONE);
+            mMovieProgressBar.setVisibility(View.GONE);
+            mMovieDataLinearLayout.setVisibility(View.GONE);
+            mDetailErrorMessageTextView.setVisibility(View.VISIBLE);
         }
     }
 }

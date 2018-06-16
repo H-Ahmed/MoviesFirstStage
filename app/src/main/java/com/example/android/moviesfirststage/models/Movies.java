@@ -17,7 +17,6 @@ public class Movies implements Parcelable {
     }
 
 
-
     public Movies(String posterPath, String id) {
         mId = id;
         mPosterPath = posterPath;
