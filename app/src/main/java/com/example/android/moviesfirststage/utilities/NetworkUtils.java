@@ -1,6 +1,7 @@
 package com.example.android.moviesfirststage.utilities;
 
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -12,6 +13,7 @@ import okhttp3.Response;
 
 public final class NetworkUtils {
 
+    private static final String TAG = "NetworkUtils";
     private final static String MOVIES_BASE_URL = "https://api.themoviedb.org/3/movie";
     private final static String API = "api_key";
 
@@ -25,7 +27,7 @@ public final class NetworkUtils {
         try {
             url = new URL(buildUri.toString());
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
         return url;
     }
